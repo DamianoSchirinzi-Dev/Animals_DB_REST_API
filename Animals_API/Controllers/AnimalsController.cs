@@ -14,10 +14,12 @@ namespace Animals_API.Controllers
     public class AnimalsController : ControllerBase
     {
         private readonly animals_DB _context;
+        private readonly ILogger<AnimalsController> _logger;
 
-        public AnimalsController(animals_DB context)
+        public AnimalsController(animals_DB context, ILogger<AnimalsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Animals
@@ -26,7 +28,8 @@ namespace Animals_API.Controllers
         {
           if (_context.Animals == null)
           {
-              return NotFound();
+                _logger.LogCritical($"Database is empty?!");
+                return NotFound();
           }
             return await _context.Animals.ToListAsync();
         }
@@ -43,11 +46,18 @@ namespace Animals_API.Controllers
 
             if (animal == null)
             {
+                _logger.LogInformation($"User input {id} was used to search and returned no results.");
+
                 return NotFound();
             }
 
+            _logger.LogError("Error log!");
+            _logger.LogCritical("Critical log!");
+            _logger.LogDebug("Debug log!");
+            _logger.LogTrace("Trace log!");
+
             return animal;
-         }
+          }
 
         // PUT: api/Animals/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -81,7 +91,6 @@ namespace Animals_API.Controllers
         }
 
         // POST: api/Animals
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Animal>> PostAnimal(Animal animal)
         {
